@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>얼룩 인식 모델</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 40px; }
+    input[type=file] { margin-top: 20px; }
+    img { width: 300px; margin-top: 20px; border-radius: 10px; }
+    .result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>☕ Coffee / 🍷 Wine / 🧼 Clean 분류기</h1>
+
+  <form action="/predict" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" accept="image/*">
+    <br>
+    <button type="submit">예측하기</button>
+  </form>
+
+  {% if filename %}
+    <img src="{{ url_for('static', filename=filename) }}" alt="Uploaded Image">
+  {% endif %}
+
+  {% if result %}
+    <div class="result">
+      <p>예측 결과: <b>{{ result.label }}</b></p>
+      <p>Clean: {{ result.Clean }}</p>
+      <p>Coffee: {{ result.Coffee }}</p>
+      <p>Wine: {{ result.Wine }}</p>
+    </div>
+  {% endif %}
+</body>
+</html>
