@@ -7,24 +7,31 @@ import os
 app = Flask(__name__)
 
 # ===== 모델 관련 설정 =====
-# app.py 파일이 있는 폴더 기준으로 경로 설정
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "coffee_model.pth")   # 상대경로
+MODEL_PATH = os.path.join(BASE_DIR, "coffee_model.pth")
 
 CLASS_NAMES = ["Clean", "Coffee", "Wine"]
 
-# 모델 불러오기
-model = models.resnet18(weights=None)
-model.fc = torch.nn.Linear(model.fc.in_features, len(CLASS_NAMES))
-model.load_state_dict(torch.load(MODEL_PATH, map_location="cpu"))
-model.eval()
+# ===== 모델 lazy load =====
+model = None
+
+def get_model():
+    global model
+    if model is None:
+        print("Loading model for the first time...")
+        m = models.resnet18(weights=None)
+        m.fc = torch.nn.Linear(m.fc.in_features, len(CLASS_NAMES))
+        m.load_state_dict(torch.load(MODEL_PATH, map_location="cpu"))
+        m.eval()
+        model = m
+    return model
+
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor()
 ])
 
-# static 폴더 절대경로
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -42,14 +49,19 @@ def predict():
     if file.filename == "":
         return "Empty filename", 400
 
+    # Save image
     path = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(path)
 
+    # Prepare image
     img = Image.open(path).convert("RGB")
     img_t = transform(img).unsqueeze(0)
 
+    # Lazy load model
+    m = get_model()
+
     with torch.no_grad():
-        outputs = model(img_t)
+        outputs = m(img_t)
         probs = torch.softmax(outputs, dim=1)[0]
         _, pred = torch.max(outputs, 1)
         label = CLASS_NAMES[pred.item()]
@@ -60,3 +72,4 @@ def predict():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+
