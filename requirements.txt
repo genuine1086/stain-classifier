@@ -1,5 +1,5 @@
 flask
-torch==2.9.0
-torchvision==0.20.1
+torch==2.1.0
+torchvision==0.21.0
 Pillow
 gunicorn
