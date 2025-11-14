@@ -7,7 +7,10 @@ import os
 app = Flask(__name__)
 
 # ===== 모델 관련 설정 =====
-MODEL_PATH = "/home/aaron/ai/train_code/coffee_model.pth"
+# app.py 파일이 있는 폴더 기준으로 경로 설정
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "coffee_model.pth")   # 상대경로
+
 CLASS_NAMES = ["Clean", "Coffee", "Wine"]
 
 # 모델 불러오기
@@ -21,12 +24,15 @@ transform = transforms.Compose([
     transforms.ToTensor()
 ])
 
-UPLOAD_FOLDER = "static"
+# static 폴더 절대경로
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "static")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 
 @app.route("/")
 def home():
     return render_template("index.html")
+
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -51,5 +57,7 @@ def predict():
     result = {CLASS_NAMES[i]: f"{probs[i]*100:.2f}%" for i in range(len(CLASS_NAMES))}
     return render_template("index.html", result=result, filename=file.filename, label=label)
 
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
