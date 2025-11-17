@@ -240,6 +240,75 @@
       margin-right: 8px;
     }
 
+    /* Advice box styles */
+    .advice-box {
+      margin: 30px 0;
+    }
+
+    .advice {
+      padding: 30px;
+      border-radius: 20px;
+      animation: slideUp 0.5s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .clean-advice {
+      background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(129, 199, 132, 0.15) 100%);
+      border: 2px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .coffee-advice {
+      background: linear-gradient(135deg, rgba(139, 69, 19, 0.1) 0%, rgba(160, 82, 45, 0.1) 100%);
+      border: 2px solid rgba(139, 69, 19, 0.3);
+    }
+
+    .wine-advice {
+      background: linear-gradient(135deg, rgba(114, 47, 55, 0.1) 0%, rgba(139, 0, 0, 0.1) 100%);
+      border: 2px solid rgba(114, 47, 55, 0.3);
+    }
+
+    .advice-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+
+    .advice-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .advice-steps p {
+      font-size: 1.05rem;
+      color: #444;
+      margin-bottom: 12px;
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    .advice-steps strong {
+      color: #667eea;
+      font-weight: 700;
+    }
+
+    .tip {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+      font-style: italic;
+    }
+
+    .clean-advice p {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #2e7d32;
+      font-weight: 600;
+    }
+
+
     /* Loading state */
     .loading {
       display: none;
@@ -290,16 +359,51 @@
       <p style="color: #667eea; font-weight: 600;">AI가 이미지를 분석중입니다...</p>
     </div>
 
-    {% if filename %}
+    {% if filename is defined and filename %}
     <div class="image-preview">
       <img src="{{ url_for('static', filename=filename) }}" alt="Uploaded Image">
     </div>
     {% endif %}
 
-    {% if result %}
+    {% if result is defined and result %}
     <div class="result">
       <div class="result-label">
         예측 결과: <b>{{ result.label }}</b>
+      </div>
+      
+     <!-- Cleaning advice based on result -->
+     <div class="advice-box">
+        {% if result.label == 'Clean' %}
+          <div class="advice clean-advice">
+            <div class="advice-icon">✨</div>
+            <div class="advice-title">깨끗합니다!</div>
+            <p>얼룩이 감지되지 않았습니다. 옷이 깨끗한 상태입니다.</p>
+          </div>
+        {% elif result.label == 'Coffee' %}
+          <div class="advice coffee-advice">
+            <div class="advice-icon">☕</div>
+            <div class="advice-title">커피 얼룩 제거 방법</div>
+            <div class="advice-steps">
+              <p><strong>1단계:</strong> 찬물로 얼룩 부위를 즉시 헹궈주세요</p>
+              <p><strong>2단계:</strong> 중성세제를 물에 희석해서 얼룩에 발라주세요</p>
+              <p><strong>3단계:</strong> 5-10분 정도 기다린 후 부드럽게 문질러주세요</p>
+              <p><strong>4단계:</strong> 찬물로 충분히 헹군 후 일반 세탁해주세요</p>
+              <p class="tip">💡 <strong>꿀팁:</strong> 베이킹소다를 물에 개어 바르면 더 효과적입니다!</p>
+            </div>
+          </div>
+        {% elif result.label == 'Wine' %}
+          <div class="advice wine-advice">
+            <div class="advice-icon">🍷</div>
+            <div class="advice-title">와인 얼룩 제거 방법</div>
+            <div class="advice-steps">
+              <p><strong>1단계:</strong> 키친타올로 얼룩을 최대한 흡수시켜주세요 (문지르지 마세요!)</p>
+              <p><strong>2단계:</strong> 소금을 얼룩 위에 충분히 뿌려 15-20분 방치하세요</p>
+              <p><strong>3단계:</strong> 찬물로 소금을 헹궈낸 후 중성세제로 세탁하세요</p>
+              <p><strong>4단계:</strong> 얼룩이 남아있다면 과탄산소다를 사용해보세요</p>
+              <p class="tip">💡 <strong>꿀팁:</strong> 화이트 와인이나 탄산수를 부어도 효과적입니다!</p>
+            </div>
+          </div>
+        {% endif %}
       </div>
       
       <div class="confidence-bars">
