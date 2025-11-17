@@ -38,7 +38,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("index.html",result=None, filename=None)
 
 
 @app.route("/predict", methods=["POST"])
@@ -66,10 +66,25 @@ def predict():
         _, pred = torch.max(outputs, 1)
         label = CLASS_NAMES[pred.item()]
 
-    result = {CLASS_NAMES[i]: f"{probs[i]*100:.2f}%" for i in range(len(CLASS_NAMES))}
+    result = {
+        'label': label,
+        'Clean': f"{probs[0]*100:.1f}%",
+        'Coffee': f"{probs[1]*100:.1f}%",
+        'Wine': f"{probs[2]*100:.1f}%"
+    }
+
+    print("===== DEBUG =====")
+    print(f"label: '{label}'")
+    print(f"label == Clean: {label == 'Clean'}")
+    print(f"label == Coffee: {label == 'Coffee'}")
+    print(f"label == Wine: {label == 'Wine'}")
+    print("=================")
     return render_template("index.html", result=result, filename=file.filename, label=label)
 
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
